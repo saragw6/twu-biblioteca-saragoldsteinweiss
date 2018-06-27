@@ -13,15 +13,23 @@ public class BibliotecaAppTest {
     public void main() {
         BibliotecaApp.main(null);
 
-        assertEquals("Hello! Welcome to Biblioteca.\n", sysOut.asString());
+
+        String welcomeStr = "Hello! Welcome to Biblioteca.\n";
+        String bookStr = "Harry Potter | JKR | 1997\nLord of the Rings | JRT | 1954\n";
+
+        assertEquals(welcomeStr + bookStr, sysOut.asString());
     }
 
     @Test
     public void ListBooks() {
-        String[] books = {"Harry Potter", "Lord of the Rings"};
+        Book hp = new Book("Harry Potter", "JKR",1997);
+        Book lotr = new Book("Lord of the Rings", "JRT", 1954);
+        Book[] books = new Book[]{hp, lotr};
 
         BibliotecaApp.ListBooks(books);
 
-        assertEquals("Harry Potter\nLord of the Rings\n", sysOut.asString());
+        String bookStr = "Harry Potter | JKR | 1997\nLord of the Rings | JRT | 1954\n";
+
+        assertEquals(bookStr, sysOut.asString());
     }
 }
