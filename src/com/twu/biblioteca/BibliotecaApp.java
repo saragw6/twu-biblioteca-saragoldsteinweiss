@@ -10,11 +10,19 @@ public class BibliotecaApp {
 
         System.out.println("Hello! Welcome to Biblioteca.");
         ListBooks(books);
+
+        ShowMenu();
     }
 
     static void ListBooks(Book[] books) {
         for(Book book : books) {
             System.out.println(book.title + " | " + book.author + " | " + book.year);
         }
+    }
+
+    static void ShowMenu() {
+        String menuStr = "Options:\nList Books\n";
+
+        System.out.print(menuStr);
     }
 }

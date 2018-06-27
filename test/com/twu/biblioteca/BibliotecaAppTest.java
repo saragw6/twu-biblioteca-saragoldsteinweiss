@@ -16,8 +16,9 @@ public class BibliotecaAppTest {
 
         String welcomeStr = "Hello! Welcome to Biblioteca.\n";
         String bookStr = "Harry Potter | JKR | 1997\nLord of the Rings | JRT | 1954\n";
+        String menuStr = "Options:\nList Books\n";
 
-        assertEquals(welcomeStr + bookStr, sysOut.asString());
+        assertEquals(welcomeStr + bookStr + menuStr, sysOut.asString());
     }
 
     @Test
@@ -31,5 +32,14 @@ public class BibliotecaAppTest {
         String bookStr = "Harry Potter | JKR | 1997\nLord of the Rings | JRT | 1954\n";
 
         assertEquals(bookStr, sysOut.asString());
+    }
+
+    @Test
+    public void ShowMenu() {
+        BibliotecaApp.ShowMenu();
+
+        String menuStr = "Options:\nList Books\n";
+
+        assertEquals(menuStr, sysOut.asString());
     }
 }
