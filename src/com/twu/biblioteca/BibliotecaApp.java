@@ -43,7 +43,12 @@ public class BibliotecaApp {
 //                System.out.println("group 1: " + matcher.group(1));
 //                System.out.println("group 2: " + matcher.group(2));
 //                System.out.println("group 3: " + matcher.group(3));
-                CheckOutBook(matcher.group(1), matcher.group(2), Integer.parseInt(matcher.group(3)));
+                Boolean success = CheckOutBook(matcher.group(1), matcher.group(2), Integer.parseInt(matcher.group(3)));
+                if (success) {
+                    System.out.println("Thank you! Enjoy the book");
+                } else {
+                    System.out.println("That book is not available.");
+                }
             }
 
             //Check out ((?:\w|\s)*) by ((?:\w|\s)*) in (\d*)
@@ -67,12 +72,15 @@ public class BibliotecaApp {
         System.out.print(menuStr);
     }
 
-    static void CheckOutBook(String title, String author, Integer year) {
+    static Boolean CheckOutBook(String title, String author, Integer year) {
+        Boolean success = false;
         for(Book book : books) {
             if (book.title.equals(title) && book.author.equals(author) && book.year.equals(year)) {
 //                book.setAvailable(false);
+                success = true;
                 book.available = false;
             }
         }
+        return success;
     }
 }

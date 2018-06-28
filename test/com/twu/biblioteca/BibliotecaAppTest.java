@@ -92,5 +92,22 @@ public class BibliotecaAppTest {
         BibliotecaApp.books[0].setAvailable(true); //reset
     }
 
+    @Test
+    public void SuccessfulCheckoutMessage() {
+        BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1997\n");
+
+        String successStr = "Thank you! Enjoy the book\n";
+
+        assertEquals(successStr, sysOut.asString());
+    }
+
+    @Test
+    public void UnsuccessfulCheckoutMessage() {
+        BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1996\n");
+
+        String successStr = "That book is not available.\n";
+
+        assertEquals(successStr, sysOut.asString());
+    }
 
 }
