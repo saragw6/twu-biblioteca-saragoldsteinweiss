@@ -94,6 +94,7 @@ public class BibliotecaAppTest {
 
     @Test
     public void SuccessfulCheckoutMessage() {
+        BibliotecaApp.books[0].setAvailable(true); //ensure checked in
         BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1997\n");
 
         String successStr = "Thank you! Enjoy the book\n";
@@ -145,5 +146,24 @@ public class BibliotecaAppTest {
         String bookStr = "Harry Potter | JKR | 1997\nLord of the Rings | JRT | 1954\n";
 
         assertEquals(bookStr, sysOut.asString());
+    }
+
+    @Test
+    public void SuccessfulCheckinMessage() {
+        BibliotecaApp.books[0].setAvailable(false); //simulate checkout
+        BibliotecaApp.HandleInput("Check in Harry Potter by JKR in 1997\n");
+
+        String successStr = "Thank you for returning the book.\n";
+
+        assertEquals(successStr, sysOut.asString());
+    }
+
+    @Test
+    public void UnsuccessfulCheckinMessage() {
+        BibliotecaApp.HandleInput("Check in Harry Potter by JKR in 1996\n");
+
+        String successStr = "That is not a valid book to return.\n";
+
+        assertEquals(successStr, sysOut.asString());
     }
 }

@@ -51,12 +51,12 @@ public class BibliotecaApp {
             Pattern pattern = Pattern.compile("Check in ((?:\\w|\\s)*) by ((?:\\w|\\s)*) in (\\d*)");
             Matcher matcher = pattern.matcher(command);
             while (matcher.find()) {
-                CheckInBook(matcher.group(1), matcher.group(2), Integer.parseInt(matcher.group(3)));
-//                if (success) {
-//                    System.out.println("Thank you! Enjoy the book");
-//                } else {
-//                    System.out.println("That book is not available.");
-//                }
+                Boolean success = CheckInBook(matcher.group(1), matcher.group(2), Integer.parseInt(matcher.group(3)));
+                if (success) {
+                    System.out.println("Thank you for returning the book.");
+                } else {
+                    System.out.println("That is not a valid book to return.");
+                }
             }
         } else {
             System.out.println("Select a valid option!");
@@ -79,28 +79,25 @@ public class BibliotecaApp {
     }
 
     static Boolean CheckOutBook(String title, String author, Integer year) {
-        Boolean success = false;
         for(Book book : books) {
             if (book.title.equals(title) && book.author.equals(author) && book.year.equals(year) && book.available) {
 //                book.setAvailable(false);
-                success = true;
                 book.available = false;
-                //should there be a check that it was checked in?
+                return true;
             }
         }
-        return success;
+        return false;
     }
 
-    static void CheckInBook(String title, String author, Integer year) {
+    static Boolean CheckInBook(String title, String author, Integer year) {
         //Boolean success = false;
         for(Book book : books) {
-            if (book.title.equals(title) && book.author.equals(author) && book.year.equals(year)) {
+            if (book.title.equals(title) && book.author.equals(author) && book.year.equals(year) && !book.available) {
 //                book.setAvailable(false);
-                //success = true;
                 book.available = true;
-                //should there be a check that it was checked out?
+                return true;
             }
         }
-        //return success;
+        return false;
     }
 }
