@@ -110,4 +110,40 @@ public class BibliotecaAppTest {
         assertEquals(successStr, sysOut.asString());
     }
 
+    @Test
+    public void CheckoutUnavailableBookFails() {
+        BibliotecaApp.books[0].setAvailable(false); //simulate checkout
+        BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1997\n");
+
+        String successStr = "That book is not available.\n";
+
+        assertEquals(successStr, sysOut.asString());
+    }
+
+    @Test
+    public void CheckInMarksBookAvailable() {
+        BibliotecaApp.books[0].setAvailable(false); //simulate checkout
+
+        BibliotecaApp.CheckInBook("Harry Potter", "JKR", 1997);
+        assert(BibliotecaApp.books[0].isAvailable());
+    }
+
+    @Test
+    public void HandleCheckInCommand() {
+        BibliotecaApp.books[0].setAvailable(false); //simulate checkout
+
+        BibliotecaApp.HandleInput("Check in Harry Potter by JKR in 1997\n");
+        assert(BibliotecaApp.books[0].isAvailable());
+    }
+
+    @Test
+    public void PrintReturnedBooks() {
+        BibliotecaApp.books[0].setAvailable(false); //simulate checkout
+        BibliotecaApp.CheckInBook("Harry Potter", "JKR", 1997);
+        BibliotecaApp.ListBooks();
+
+        String bookStr = "Harry Potter | JKR | 1997\nLord of the Rings | JRT | 1954\n";
+
+        assertEquals(bookStr, sysOut.asString());
+    }
 }
