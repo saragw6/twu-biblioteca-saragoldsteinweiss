@@ -18,10 +18,9 @@ public class BibliotecaApp {
         Boolean readInput = true;
         Scanner scanner = new Scanner(System.in);
 
-        command = scanner.nextLine();
         while (readInput) {
-            readInput = HandleInput(command);
             command = scanner.nextLine();
+            readInput = HandleInput(command);
         }
     }
 

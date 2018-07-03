@@ -40,19 +40,10 @@ public class BibliotecaAppTest {
         assertEquals(menuStr, sysOut.asString());
     }
 
-    //test "quit" --> exit (this test doesnt work yet)
-//    @Test
-//    public void QuitCausesExit() {
-//        BibliotecaApp.main(null);
-//
-//        ByteArrayInputStream in = new ByteArrayInputStream("quit\n".getBytes());
-//        System.setIn(in);
-//
-//        assertEquals(null, sysOut.asString());
-//
-//        // optionally, reset System.in to its original
-//        System.setIn(System.in);
-//    }
+    @Test
+    public void HandleInputReturnsFalseOnQuit() {
+        assertFalse(BibliotecaApp.HandleInput("quit"));
+    }
 
     @Test
     public void InvalidMenuOption() {
