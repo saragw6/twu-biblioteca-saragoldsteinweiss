@@ -1,7 +1,5 @@
 package com.twu.biblioteca;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 class Book {
     String title;
     String author;

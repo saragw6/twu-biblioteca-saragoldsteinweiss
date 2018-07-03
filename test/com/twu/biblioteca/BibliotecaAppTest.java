@@ -3,31 +3,27 @@ package com.twu.biblioteca;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static com.twu.biblioteca.BibliotecaApp.books;
+import java.io.ByteArrayInputStream;
+import java.lang.System;
+
 import static org.junit.Assert.*;
 
 public class BibliotecaAppTest {
 
     @Rule public SystemOutResource sysOut = new SystemOutResource();
 
-//    @Test
-//    public void main() {
-//        BibliotecaApp.main(null);
-//
-//
-//        String welcomeStr = "Hello! Welcome to Biblioteca.\n";
-//        String bookStr = "Harry Potter | JKR | 1997\nLord of the Rings | JRT | 1954\n";
-//        String menuStr = "Enter one of the following commands to get started:\nList Books\n";
-//
-//        assertEquals(welcomeStr + bookStr + menuStr, sysOut.asString());
-//    }
+    @Test
+    public void PrintIntro() {
+        BibliotecaApp.PrintIntro();
+
+        String welcomeStr = "Hello! Welcome to Biblioteca.\n";
+        String menuStr = "Enter one of the following commands to get started:\nList Books\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nQuit\n";
+
+        assertEquals(welcomeStr + menuStr, sysOut.asString());
+    }
 
     @Test
     public void ListBooks() {
-//        Book hp = new Book("Harry Potter", "JKR",1997);
-//        Book lotr = new Book("Lord of the Rings", "JRT", 1954);
-//        Book[] books = new Book[]{hp, lotr};
-
         BibliotecaApp.ListBooks();
 
         String bookStr = "Harry Potter | JKR | 1997\nLord of the Rings | JRT | 1954\n";
@@ -39,7 +35,7 @@ public class BibliotecaAppTest {
     public void ShowMenu() {
         BibliotecaApp.ShowMenu();
 
-        String menuStr = "List Books\n";
+        String menuStr = "List Books\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nQuit\n";
 
         assertEquals(menuStr, sysOut.asString());
     }
@@ -68,7 +64,8 @@ public class BibliotecaAppTest {
 
     @Test
     public void CheckOutMarksBookUnavailable() {
-        BibliotecaApp.CheckOutBook("Harry Potter", "JKR", 1997);
+        //BibliotecaApp.CheckOutBook("harry potter", "jkr", 1997);
+        BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, false);
         assert(!BibliotecaApp.books[0].isAvailable());
 
         BibliotecaApp.books[0].setAvailable(true); //reset
@@ -76,7 +73,8 @@ public class BibliotecaAppTest {
 
     @Test
     public void OnlyPrintAvailableBooks() {
-        BibliotecaApp.CheckOutBook("Harry Potter", "JKR", 1997);
+        //BibliotecaApp.CheckOutBook("harry potter", "jkr", 1997);
+        BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, false);
         BibliotecaApp.ListBooks();
 
         String bookStr = "Lord of the Rings | JRT | 1954\n";
@@ -125,7 +123,9 @@ public class BibliotecaAppTest {
     public void CheckInMarksBookAvailable() {
         BibliotecaApp.books[0].setAvailable(false); //simulate checkout
 
-        BibliotecaApp.CheckInBook("Harry Potter", "JKR", 1997);
+        //BibliotecaApp.CheckInBook("harry potter", "jkr", 1997);
+        BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, true);
+
         assert(BibliotecaApp.books[0].isAvailable());
     }
 
@@ -140,7 +140,8 @@ public class BibliotecaAppTest {
     @Test
     public void PrintReturnedBooks() {
         BibliotecaApp.books[0].setAvailable(false); //simulate checkout
-        BibliotecaApp.CheckInBook("Harry Potter", "JKR", 1997);
+        //BibliotecaApp.CheckInBook("harry potter", "jkr", 1997);
+        BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, true);
         BibliotecaApp.ListBooks();
 
         String bookStr = "Harry Potter | JKR | 1997\nLord of the Rings | JRT | 1954\n";

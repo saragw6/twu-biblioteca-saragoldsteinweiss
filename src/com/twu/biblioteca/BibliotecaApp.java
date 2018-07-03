@@ -12,46 +12,50 @@ public class BibliotecaApp {
     static Book[] books = new Book[]{hp, lotr};
 
     public static void main(String[] args) {
+        PrintIntro();
+
         String command;
+        Boolean readInput = true;
         Scanner scanner = new Scanner(System.in);
 
-//        Book hp = new Book("Harry Potter", "JKR",1997);
-//        Book lotr = new Book("Lord of the Rings", "JRT", 1954);
-//        Book[] books = new Book[]{hp, lotr};
+        command = scanner.nextLine();
+        while (readInput) {
+            readInput = HandleInput(command);
+            command = scanner.nextLine();
+        }
+    }
 
+    static void PrintIntro() {
         System.out.println("Hello! Welcome to Biblioteca.");
         //ListBooks(books);
 
         System.out.println("Enter one of the following commands to get started:");
         ShowMenu();
-
-        command = scanner.nextLine();
-        while (!command.equals("quit") && !command.equals("Quit\n")) {
-            HandleInput(command);
-            command = scanner.nextLine();
-        }
     }
 
-    static void HandleInput(String command) {
+    static Boolean HandleInput(String command) {
+        command = command.toLowerCase();
         //eventually use objects for menu items that have callbacks stored in them?
-        if (command.equals("List Books")) {
+        if(command.equals("quit")) {
+            return false;
+        } else if (command.equals("list books")) {
             ListBooks();
-        } else if (command.contains("Check out")) {
-            Pattern pattern = Pattern.compile("Check out ((?:\\w|\\s)*) by ((?:\\w|\\s)*) in (\\d*)");
+        } else if (command.contains("check out")) {
+            Pattern pattern = Pattern.compile("check out ((?:\\w|\\s)*) by ((?:\\w|\\s)*) in (\\d*)");
             Matcher matcher = pattern.matcher(command);
             while (matcher.find()) {
-                Boolean success = CheckOutBook(matcher.group(1), matcher.group(2), Integer.parseInt(matcher.group(3)));
+                Boolean success = BookTransaction(matcher.group(1), matcher.group(2), Integer.parseInt(matcher.group(3)), false);
                 if (success) {
                     System.out.println("Thank you! Enjoy the book");
                 } else {
                     System.out.println("That book is not available.");
                 }
             }
-        } else if (command.contains("Check in")) {
-            Pattern pattern = Pattern.compile("Check in ((?:\\w|\\s)*) by ((?:\\w|\\s)*) in (\\d*)");
+        } else if (command.contains("check in")) {
+            Pattern pattern = Pattern.compile("check in ((?:\\w|\\s)*) by ((?:\\w|\\s)*) in (\\d*)");
             Matcher matcher = pattern.matcher(command);
             while (matcher.find()) {
-                Boolean success = CheckInBook(matcher.group(1), matcher.group(2), Integer.parseInt(matcher.group(3)));
+                Boolean success = BookTransaction(matcher.group(1), matcher.group(2), Integer.parseInt(matcher.group(3)), true);
                 if (success) {
                     System.out.println("Thank you for returning the book.");
                 } else {
@@ -61,9 +65,9 @@ public class BibliotecaApp {
         } else {
             System.out.println("Select a valid option!");
         }
+        return true;
     }
 
-    //retest
     static void ListBooks() {
         for(Book book : books) {
             if (book.available) {
@@ -72,32 +76,23 @@ public class BibliotecaApp {
         }
     }
 
-    //refactor
+    //refactor?
     static void ShowMenu() {
-        String menuStr = "List Books\n";
+        String menuStr = "List Books\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nQuit\n";
         System.out.print(menuStr);
     }
 
-    static Boolean CheckOutBook(String title, String author, Integer year) {
+    static Boolean BookTransaction(String title, String author, Integer year, Boolean checkin) {
         for(Book book : books) {
-            if (book.title.equals(title) && book.author.equals(author) && book.year.equals(year) && book.available) {
+            if (book.title.toLowerCase().equals(title)
+                    && book.author.toLowerCase().equals(author)
+                    && book.year.equals(year) && (book.available != checkin)) {
 //                book.setAvailable(false);
-                book.available = false;
+                book.available = checkin;
                 return true;
             }
         }
         return false;
     }
 
-    static Boolean CheckInBook(String title, String author, Integer year) {
-        //Boolean success = false;
-        for(Book book : books) {
-            if (book.title.equals(title) && book.author.equals(author) && book.year.equals(year) && !book.available) {
-//                book.setAvailable(false);
-                book.available = true;
-                return true;
-            }
-        }
-        return false;
-    }
 }
