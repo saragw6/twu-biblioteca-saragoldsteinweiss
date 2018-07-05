@@ -11,6 +11,10 @@ public class BibliotecaApp {
     private static Book lotr = new Book("Lord of the Rings", "JRT", 1954);
     static Book[] books = new Book[]{hp, lotr};
 
+    private static Movie oz = new Movie("The Wizard of Oz", 1939, "Victor Fleming", 8);
+    private static Movie incredibles = new Movie("Incredibles 2", 2018, "Brad Bird", 8);
+    static Movie[] movies = new Movie[]{oz, incredibles};
+
     public static void main(String[] args) {
         PrintIntro();
 
@@ -40,25 +44,44 @@ public class BibliotecaApp {
         } else if (command.equals("list books")) {
             ListBooks();
         } else if (command.contains("check out")) {
-            Pattern pattern = Pattern.compile("check out ((?:\\w|\\s)*) by ((?:\\w|\\s)*) in (\\d*)");
-            Matcher matcher = pattern.matcher(command);
-            while (matcher.find()) {
-                Boolean success = BookTransaction(matcher.group(1), matcher.group(2), Integer.parseInt(matcher.group(3)), false);
+            Pattern bookPattern = Pattern.compile("check out ((?:\\w|\\s)*) by ((?:\\w|\\s)*) in (\\d*)");
+            Matcher bookMatcher = bookPattern.matcher(command);
+            Pattern moviePattern = Pattern.compile("check out ((?:\\w|\\s)*) [(]((?:\\d)*)[)]");
+            Matcher movieMatcher = moviePattern.matcher(command);
+            if (bookMatcher.find()) {
+                Boolean success = BookTransaction(bookMatcher.group(1), bookMatcher.group(2), Integer.parseInt(bookMatcher.group(3)), false);
                 if (success) {
                     System.out.println("Thank you! Enjoy the book");
                 } else {
                     System.out.println("That book is not available.");
                 }
+            } else if (movieMatcher.find()) {
+                Boolean success = MovieTransaction(movieMatcher.group(1), Integer.parseInt(movieMatcher.group(2)), false);
+                if (success) {
+                    System.out.println("Thank you! Enjoy the movie");
+                } else {
+                    System.out.println("That movie is not available.");
+                }
             }
         } else if (command.contains("check in")) {
-            Pattern pattern = Pattern.compile("check in ((?:\\w|\\s)*) by ((?:\\w|\\s)*) in (\\d*)");
-            Matcher matcher = pattern.matcher(command);
-            while (matcher.find()) {
-                Boolean success = BookTransaction(matcher.group(1), matcher.group(2), Integer.parseInt(matcher.group(3)), true);
+            Pattern bookPattern = Pattern.compile("check in ((?:\\w|\\s)*) by ((?:\\w|\\s)*) in (\\d*)");
+            Matcher bookMatcher = bookPattern.matcher(command);
+            Pattern moviePattern = Pattern.compile("check in ((?:\\w|\\s)*) [(]((?:\\d)*)[)]");
+            Matcher movieMatcher = moviePattern.matcher(command);
+            if (bookMatcher.find()) {
+                Boolean success = BookTransaction(bookMatcher.group(1), bookMatcher.group(2), Integer.parseInt(bookMatcher.group(3)), true);
                 if (success) {
                     System.out.println("Thank you for returning the book.");
                 } else {
                     System.out.println("That is not a valid book to return.");
+                }
+            } else if (movieMatcher.find()) {
+                //Boolean success = false; //temp
+                Boolean success = MovieTransaction(movieMatcher.group(1), Integer.parseInt(movieMatcher.group(2)), true);
+                if (success) {
+                    System.out.println("Thank you for returning the movie.");
+                } else {
+                    System.out.println("That is not a valid movie to return.");
                 }
             }
         } else {
@@ -75,9 +98,17 @@ public class BibliotecaApp {
         }
     }
 
+    static void ListMovies() {
+        for(Movie movie : movies) {
+            if (movie.available) {
+                System.out.println(movie.title + " | " + movie.year + " | " + movie.director + " | " + movie.rating);
+            }
+        }
+    }
+
     //refactor?
     static void ShowMenu() {
-        String menuStr = "List Books\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nQuit\n";
+        String menuStr = "List Books\nList Movies\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nQuit\n";
         System.out.print(menuStr);
     }
 
@@ -86,8 +117,18 @@ public class BibliotecaApp {
             if (book.title.toLowerCase().equals(title)
                     && book.author.toLowerCase().equals(author)
                     && book.year.equals(year) && (book.available != checkin)) {
-//                book.setAvailable(false);
                 book.available = checkin;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static Boolean MovieTransaction(String title, Integer year, Boolean checkin) {
+        for(Movie movie : movies) {
+            if (movie.title.toLowerCase().equals(title)
+                    && movie.year.equals(year) && (movie.available != checkin)) {
+                movie.available = checkin;
                 return true;
             }
         }

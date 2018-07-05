@@ -17,7 +17,7 @@ public class BibliotecaAppTest {
         BibliotecaApp.PrintIntro();
 
         String welcomeStr = "Hello! Welcome to Biblioteca.\n";
-        String menuStr = "Enter one of the following commands to get started:\nList Books\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nQuit\n";
+        String menuStr = "Enter one of the following commands to get started:\nList Books\nList Movies\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nQuit\n";
 
         assertEquals(welcomeStr + menuStr, sysOut.asString());
     }
@@ -32,10 +32,22 @@ public class BibliotecaAppTest {
     }
 
     @Test
+    public void ListMovies() {
+        for (Movie movie : BibliotecaApp.movies) {
+            movie.setAvailable(true);
+        }
+        BibliotecaApp.ListMovies();
+
+        String movieStr = "The Wizard of Oz | 1939 | Victor Fleming | 8\nIncredibles 2 | 2018 | Brad Bird | 8\n";
+
+        assertEquals(movieStr, sysOut.asString());
+    }
+
+    @Test
     public void ShowMenu() {
         BibliotecaApp.ShowMenu();
 
-        String menuStr = "List Books\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nQuit\n";
+        String menuStr = "List Books\nList Movies\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nQuit\n";
 
         assertEquals(menuStr, sysOut.asString());
     }
@@ -63,6 +75,15 @@ public class BibliotecaAppTest {
     }
 
     @Test
+    public void CheckOutMarksMovieUnavailable() {
+        //BibliotecaApp.CheckOutBook("harry potter", "jkr", 1997);
+        BibliotecaApp.MovieTransaction("the wizard of oz", 1939, false);
+        assert(!BibliotecaApp.movies[0].isAvailable());
+
+        BibliotecaApp.movies[0].setAvailable(true); //reset
+    }
+
+    @Test
     public void OnlyPrintAvailableBooks() {
         //BibliotecaApp.CheckOutBook("harry potter", "jkr", 1997);
         BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, false);
@@ -74,7 +95,18 @@ public class BibliotecaAppTest {
     }
 
     @Test
-    public void HandleCheckOutCommand() {
+    public void OnlyPrintAvailableMovies() {
+        //BibliotecaApp.CheckOutBook("harry potter", "jkr", 1997);
+        BibliotecaApp.MovieTransaction("the wizard of oz", 1939, false);
+        BibliotecaApp.ListMovies();
+
+        String movieStr = "Incredibles 2 | 2018 | Brad Bird | 8\n";
+
+        assertEquals(movieStr, sysOut.asString());
+    }
+
+    @Test
+    public void HandleCheckOutBookCommand() {
         BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1997\n");
         assert(!BibliotecaApp.books[0].isAvailable());
 
@@ -82,7 +114,15 @@ public class BibliotecaAppTest {
     }
 
     @Test
-    public void SuccessfulCheckoutMessage() {
+    public void HandleCheckOutMovieCommand() {
+        BibliotecaApp.HandleInput("Check out The Wizard of Oz (1939)\n");
+        assert(!BibliotecaApp.movies[0].isAvailable());
+
+        BibliotecaApp.movies[0].setAvailable(true); //reset
+    }
+
+    @Test
+    public void SuccessfulCheckoutBookMessage() {
         BibliotecaApp.books[0].setAvailable(true); //ensure checked in
         BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1997\n");
 
@@ -92,10 +132,29 @@ public class BibliotecaAppTest {
     }
 
     @Test
-    public void UnsuccessfulCheckoutMessage() {
+    public void SuccessfulCheckoutMovieMessage() {
+        BibliotecaApp.movies[0].setAvailable(true); //ensure checked in
+        BibliotecaApp.HandleInput("Check out The Wizard of Oz (1939)\n");
+
+        String successStr = "Thank you! Enjoy the movie\n";
+
+        assertEquals(successStr, sysOut.asString());
+    }
+
+    @Test
+    public void UnsuccessfulCheckoutBookMessage() {
         BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1996\n");
 
         String successStr = "That book is not available.\n";
+
+        assertEquals(successStr, sysOut.asString());
+    }
+
+    @Test
+    public void UnsuccessfulCheckoutMovieMessage() {
+        BibliotecaApp.HandleInput("Check out The Wizard of Oz (1939)\n");
+
+        String successStr = "That movie is not available.\n";
 
         assertEquals(successStr, sysOut.asString());
     }
@@ -105,9 +164,19 @@ public class BibliotecaAppTest {
         BibliotecaApp.books[0].setAvailable(false); //simulate checkout
         BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1997\n");
 
-        String successStr = "That book is not available.\n";
+        String failStr = "That book is not available.\n";
 
-        assertEquals(successStr, sysOut.asString());
+        assertEquals(failStr, sysOut.asString());
+    }
+
+    @Test
+    public void CheckoutUnavailableMovieFails() {
+        BibliotecaApp.movies[0].setAvailable(false); //simulate checkout
+        BibliotecaApp.HandleInput("Check out The Wizard of Oz (1939)\n");
+
+        String failStr = "That movie is not available.\n";
+
+        assertEquals(failStr, sysOut.asString());
     }
 
     @Test
@@ -121,7 +190,16 @@ public class BibliotecaAppTest {
     }
 
     @Test
-    public void HandleCheckInCommand() {
+    public void CheckInMarksMovieAvailable() {
+        BibliotecaApp.movies[0].setAvailable(false); //simulate checkout
+
+        BibliotecaApp.MovieTransaction("the wizard of oz", 1939, true);
+
+        assert(BibliotecaApp.movies[0].isAvailable());
+    }
+
+    @Test
+    public void HandleCheckInBookCommand() {
         BibliotecaApp.books[0].setAvailable(false); //simulate checkout
 
         BibliotecaApp.HandleInput("Check in Harry Potter by JKR in 1997\n");
@@ -129,10 +207,18 @@ public class BibliotecaAppTest {
     }
 
     @Test
+    public void HandleCheckInMovieCommand() {
+        BibliotecaApp.movies[0].setAvailable(false); //simulate checkout
+
+        BibliotecaApp.HandleInput("Check in The Wizard of Oz (1939)\n");
+        assert(BibliotecaApp.movies[0].isAvailable());
+    }
+
+    @Test
     public void PrintReturnedBooks() {
         BibliotecaApp.books[0].setAvailable(false); //simulate checkout
-        //BibliotecaApp.CheckInBook("harry potter", "jkr", 1997);
         BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, true);
+
         BibliotecaApp.ListBooks();
 
         String bookStr = "Harry Potter | JKR | 1997\nLord of the Rings | JRT | 1954\n";
@@ -141,7 +227,19 @@ public class BibliotecaAppTest {
     }
 
     @Test
-    public void SuccessfulCheckinMessage() {
+    public void PrintReturnedMovies() {
+        BibliotecaApp.movies[0].setAvailable(false); //simulate checkout
+        BibliotecaApp.MovieTransaction("the wizard of oz", 1939, true);
+
+        BibliotecaApp.ListMovies();
+
+        String movieStr = "The Wizard of Oz | 1939 | Victor Fleming | 8\nIncredibles 2 | 2018 | Brad Bird | 8\n";
+
+        assertEquals(movieStr, sysOut.asString());
+    }
+
+    @Test
+    public void SuccessfulCheckinBookMessage() {
         BibliotecaApp.books[0].setAvailable(false); //simulate checkout
         BibliotecaApp.HandleInput("Check in Harry Potter by JKR in 1997\n");
 
@@ -151,10 +249,29 @@ public class BibliotecaAppTest {
     }
 
     @Test
-    public void UnsuccessfulCheckinMessage() {
+    public void SuccessfulCheckinMovieMessage() {
+        BibliotecaApp.movies[0].setAvailable(false); //simulate checkout
+        BibliotecaApp.HandleInput("Check in The Wizard of Oz (1939)\n");
+
+        String successStr = "Thank you for returning the movie.\n";
+
+        assertEquals(successStr, sysOut.asString());
+    }
+
+    @Test
+    public void UnsuccessfulCheckinBookMessage() {
         BibliotecaApp.HandleInput("Check in Harry Potter by JKR in 1996\n");
 
         String successStr = "That is not a valid book to return.\n";
+
+        assertEquals(successStr, sysOut.asString());
+    }
+
+    @Test
+    public void UnsuccessfulCheckinMovieMessage() {
+        BibliotecaApp.HandleInput("Check in The Wizard of Oz (1939)\n");
+
+        String successStr = "That is not a valid movie to return.\n";
 
         assertEquals(successStr, sysOut.asString());
     }
