@@ -46,7 +46,7 @@ public class BibliotecaApp {
     static Boolean HandleInput(String command) {
         command = command.toLowerCase();
         //eventually use objects for menu items that have callbacks stored in them?
-        if(command.equals("quit")) {
+        if (command.equals("quit")) {
             return false;
         } else if (command.equals("list books")) {
             ListBooks();
@@ -106,7 +106,11 @@ public class BibliotecaApp {
             System.out.println("Enter password:");
             String pw = scanner.nextLine();
             Boolean success = LogIn(id_num, pw);
-            String msg = success ? "Login Successful" : "Login failed, please try again.";
+            String msg = success ? "Login successful" : "Login failed, please try again.";
+            System.out.println(msg);
+        } else if (command.equals("log out")){
+            Boolean success = LogOut();
+            String msg = success ? "Logout successful" : "No user had logged in";
             System.out.println(msg);
         } else {
             System.out.println("Select a valid option!");
@@ -136,12 +140,14 @@ public class BibliotecaApp {
         System.out.print(menuStr);
     }
 
+    //refactor:
     static Boolean BookTransaction(String title, String author, Integer year, Boolean checkin) {
         for(Book book : books) {
             if (book.title.toLowerCase().equals(title)
                     && book.author.toLowerCase().equals(author)
                     && book.year.equals(year) && (book.available != checkin)) {
                 book.available = checkin;
+                book.borrower_id = checkin ? null : currentUser.id_number;
                 return true;
             }
         }
@@ -153,6 +159,7 @@ public class BibliotecaApp {
             if (movie.title.toLowerCase().equals(title)
                     && movie.year.equals(year) && (movie.available != checkin)) {
                 movie.available = checkin;
+                movie.borrower_id = checkin ? null : currentUser.id_number;
                 return true;
             }
         }
@@ -170,6 +177,12 @@ public class BibliotecaApp {
         }
 
         return  success;
+    }
+
+    static Boolean LogOut() {
+        Boolean success = currentUser != null;
+        currentUser = null;
+        return success;
     }
 
 }

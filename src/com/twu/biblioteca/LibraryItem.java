@@ -4,7 +4,7 @@ class LibraryItem {
     String title;
     Integer year;
     Boolean available;
-    User borrower;
+    String borrower_id;
 
     Boolean isAvailable() {
         return available;
@@ -13,5 +13,7 @@ class LibraryItem {
     void setAvailable(Boolean availability) {
         available = availability;
     }
+
+    void setBorrower(String id_num) { borrower_id = id_num; }
 
 }
