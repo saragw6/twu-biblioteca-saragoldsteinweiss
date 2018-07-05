@@ -275,4 +275,59 @@ public class BibliotecaAppTest {
 
         assertEquals(successStr, sysOut.asString());
     }
+
+    @Test
+    public void LogInSetsCurrentUser() {
+        BibliotecaApp.LogIn("123-4567", "password1");
+
+        assert(BibliotecaApp.currentUser.id_number.equals("123-4567"));
+    }
+
+    @Test
+    public void HandleLogInCommandWithSuccessMsg() {
+        ByteArrayInputStream idAndPasswd = new ByteArrayInputStream("123-4567\npassword1".getBytes());
+
+        System.setIn(idAndPasswd);
+
+        BibliotecaApp.HandleInput("Log in");
+
+        String output = "Enter id number:\nEnter password:\nLogin successful\n";
+
+
+        assert(BibliotecaApp.currentUser.id_number.equals("123-4567"));
+        assertEquals(output, sysOut.asString());
+    }
+
+    @Test
+    public void HandleLogInCommandWithFailMsg() {
+        ByteArrayInputStream idAndPasswd = new ByteArrayInputStream("123-4568\npassword1".getBytes());
+
+        System.setIn(idAndPasswd);
+
+        BibliotecaApp.HandleInput("Log in");
+
+        String output = "Enter id number:\nEnter password:\nLogin failed, please try again.\n";
+
+
+        assert(BibliotecaApp.currentUser == null);
+        assertEquals(output, sysOut.asString());
+    }
+
+    @Test
+    public void CheckInRequireLogin() {
+        BibliotecaApp.currentUser = null;
+        BibliotecaApp.HandleInput("Check in Harry Potter by JKR in 1996\n");
+        String output = "You must log in to check in an item\n";
+
+        assertEquals(output, sysOut.asString());
+    }
+
+    @Test
+    public void CheckOutRequireLogin() {
+        BibliotecaApp.currentUser = null;
+        BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1996\n");
+        String output = "You must log in to check out an item\n";
+
+        assertEquals(output, sysOut.asString());
+    }
 }
