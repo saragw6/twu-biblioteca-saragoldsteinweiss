@@ -17,7 +17,7 @@ public class BibliotecaAppTest {
         BibliotecaApp.PrintIntro();
 
         String welcomeStr = "Hello! Welcome to Biblioteca.\n";
-        String menuStr = "Enter one of the following commands to get started:\nList Books\nList Movies\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nQuit\n";
+        String menuStr = "Enter one of the following commands to get started:\nList Books\nList Movies\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nLog in\nLog out\nShow user info\nQuit\n";
 
         assertEquals(welcomeStr + menuStr, sysOut.asString());
     }
@@ -47,7 +47,7 @@ public class BibliotecaAppTest {
     public void ShowMenu() {
         BibliotecaApp.ShowMenu();
 
-        String menuStr = "List Books\nList Movies\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nQuit\n";
+        String menuStr = "Enter one of the following commands to get started:\nList Books\nList Movies\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nLog in\nLog out\nShow user info\nQuit\n";
 
         assertEquals(menuStr, sysOut.asString());
     }
@@ -415,6 +415,7 @@ public class BibliotecaAppTest {
         BibliotecaApp.LogIn("123-4567", "password1");
         BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, false);
         assertEquals("123-4567", BibliotecaApp.books[0].borrower_id);
+        BibliotecaApp.LogOut();
     }
 
     @Test
@@ -423,6 +424,36 @@ public class BibliotecaAppTest {
         BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, false);
         BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, true);
         assertNull(BibliotecaApp.books[0].borrower_id);
+        BibliotecaApp.LogOut();
+    }
+
+    @Test
+    public void PrintUserInfo() {
+        BibliotecaApp.users[0].PrintInfo();
+        String output = "Name: Seth\nEmail: seth@gmail.com\nPhone:855-555-0956\n";
+        assertEquals(output, sysOut.asString());
+    }
+
+    @Test
+    public void HandleInputUserInfo() {
+        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.HandleInput("Show user info");
+
+        String output = "Name: Seth\nEmail: seth@gmail.com\nPhone:855-555-0956\n";
+        assertEquals(output, sysOut.asString());
+
+        BibliotecaApp.LogOut();
+
+    }
+
+    @Test
+    public void UserInfoFailMsg() {
+        BibliotecaApp.currentUser = null;
+        BibliotecaApp.HandleInput("Show user info");
+
+        String output = "Please log in to view user info\n";
+        assertEquals(output, sysOut.asString());
+
     }
 
 }

@@ -16,9 +16,9 @@ public class BibliotecaApp {
     private static Movie incredibles = new Movie("Incredibles 2", 2018, "Brad Bird", 8);
     static Movie[] movies = new Movie[]{oz, incredibles};
 
-    private static User seth = new User("123-4567", "password1");
-    private static User basha = new User ("987-6543", "password2");
-    private static User[] users = new User[]{seth, basha};
+    private static User seth = new User("123-4567", "password1", "Seth", "seth@gmail.com", "855-555-0956");
+    private static User basha = new User ("987-6543", "password2", "Basha", "basha@yahoo.com", "508-555-0995");
+    static User[] users = new User[]{seth, basha};
 
     static User currentUser;
 
@@ -37,9 +37,6 @@ public class BibliotecaApp {
 
     static void PrintIntro() {
         System.out.println("Hello! Welcome to Biblioteca.");
-        //ListBooks(books);
-
-        System.out.println("Enter one of the following commands to get started:");
         ShowMenu();
     }
 
@@ -112,6 +109,12 @@ public class BibliotecaApp {
             Boolean success = LogOut();
             String msg = success ? "Logout successful" : "No user had logged in";
             System.out.println(msg);
+        } else if (command.equals("show user info")) {
+            if (currentUser == null) {
+                System.out.println("Please log in to view user info");
+            } else {
+                currentUser.PrintInfo();
+            }
         } else {
             System.out.println("Select a valid option!");
         }
@@ -136,7 +139,7 @@ public class BibliotecaApp {
 
     //refactor?
     static void ShowMenu() {
-        String menuStr = "List Books\nList Movies\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nQuit\n";
+        String menuStr = "Enter one of the following commands to get started:\nList Books\nList Movies\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nLog in\nLog out\nShow user info\nQuit\n";
         System.out.print(menuStr);
     }
 
