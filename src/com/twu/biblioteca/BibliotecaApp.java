@@ -50,6 +50,8 @@ public class BibliotecaApp {
             return false;
         } else if (command.equals("list books")) {
             ListBooks();
+        } else if (command.equals("list movies")) {
+            ListMovies();
         } else if (matcher.find()) {
             if (currentUser == null) {
                 System.out.println("You must log in to check " + matcher.group(1) + " an item");
@@ -126,6 +128,7 @@ public class BibliotecaApp {
         String id_number = scanner.nextLine();
         System.out.println("Enter password:");
         String passwd = scanner.nextLine();
+
         return LogInWithCredentials(id_number, passwd);
     }
 
@@ -139,7 +142,7 @@ public class BibliotecaApp {
             }
         }
 
-        return  success;
+        return success;
     }
 
     static Boolean LogOut() {
