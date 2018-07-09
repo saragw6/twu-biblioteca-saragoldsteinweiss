@@ -3,10 +3,8 @@ package com.twu.biblioteca;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-//import org.apache.commons.lang;
 
 public class BibliotecaApp {
-    //static String[] options = new String[]{"List Books"}; //case sensitivity?
     private static Book hp = new Book("Harry Potter", "JKR",1997);
     private static Book lotr = new Book("Lord of the Rings", "JRT", 1954);
     static Book[] books = new Book[]{hp, lotr};
@@ -15,11 +13,12 @@ public class BibliotecaApp {
     private static Movie incredibles = new Movie("Incredibles 2", 2018, "Brad Bird", 8);
     static Movie[] movies = new Movie[]{oz, incredibles};
 
-    private static User seth = new User("123-4567", "password1", "Seth", "seth@gmail.com", "855-555-0956");
-    private static User basha = new User ("987-6543", "password2", "Basha", "basha@yahoo.com", "508-555-0995");
+    private static User seth = new User("123-4567", "password1",
+                                  "Seth", "seth@gmail.com", "855-555-0956");
+    private static User basha = new User ("987-6543", "password2",
+                                    "Basha", "basha@yahoo.com", "508-555-0995");
     static User[] users = new User[]{seth, basha};
 
-    //static LibraryItem[] items = new LibraryItem[]{hp, lotr, oz, incredibles};
     static User currentUser;
 
     private static Pattern pattern = Pattern.compile("check (in|out) (book|movie) ((?:\\w|\\s)*) [(]((?:\\d)*)[)]");
@@ -45,7 +44,7 @@ public class BibliotecaApp {
     static Boolean HandleInput(String command) {
         command = command.toLowerCase();
         Matcher matcher = pattern.matcher(command);
-        //eventually use objects for menu items that have callbacks stored in them?
+
         if (command.equals("quit")) {
             return false;
         } else if (command.equals("list books")) {
@@ -53,21 +52,11 @@ public class BibliotecaApp {
         } else if (command.equals("list movies")) {
             ListMovies();
         } else if (matcher.find()) {
-            if (currentUser == null) {
-                System.out.println("You must log in to check " + matcher.group(1) + " an item");
-            } else {
-                Boolean checkin = matcher.group(1).equals("in");
-                Boolean success = LibraryTransaction(checkin, matcher.group(2).equals("book"), matcher.group(3), Integer.parseInt(matcher.group(4)));
-                System.out.println(GetTransactionString(success, checkin, matcher.group(2)));
-            }
+            LibraryTransaction(matcher);
         } else if (command.equals("log in")) {
-            Boolean success = LogIn();
-            String msg = success ? "Login successful" : "Login failed, please try again.";
-            System.out.println(msg);
+            LogIn();
         } else if (command.equals("log out")){
-            Boolean success = LogOut();
-            String msg = success ? "Logout successful" : "No user had logged in";
-            System.out.println(msg);
+            LogOut();
         } else if (command.equals("show user info")) {
             if (currentUser == null) {
                 System.out.println("Please log in to view user info");
@@ -96,23 +85,38 @@ public class BibliotecaApp {
         }
     }
 
-    //refactor?
     static void ShowMenu() {
-        String menuStr = "Enter one of the following commands to get started:\nList Books\nList Movies\nCheck out {book} by {author} in {year published}\nCheck in {book} by {author} in {year published}\nLog in\nLog out\nShow user info\nQuit\n";
+        String menuStr = "Enter one of the following commands to get started:\nList Books\nList Movies\n" +
+                "Check out book {book} ({year published})\nCheck in book {book} ({year published})\n" +
+                "Check out movie {movie} ({year published})\nCheck in movie {movie} ({year published})\n" +
+                "Log in\nLog out\nShow user info\nQuit\n";
         System.out.print(menuStr);
     }
 
-    static Boolean LibraryTransaction(Boolean checkin, Boolean isBook, String title, Integer year) {
+    //static void LibraryTransaction(Boolean checkin, Boolean isBook, String title, Integer year) {
+    private static void LibraryTransaction(Matcher matcher) {
+        if (currentUser == null) {
+            System.out.println("You must log in to check " + matcher.group(1) + " an item");
+            return;
+        }
+
+        Boolean checkin = matcher.group(1).equals("in");
+        Boolean isBook = matcher.group(2).equals("book");
+        String title = matcher.group(3);
+        Integer year = Integer.parseInt(matcher.group(4));
+        Boolean success = false;
+
         LibraryItem[] items = isBook ? books : movies;
         for (LibraryItem item : items) {
             if (item.title.toLowerCase().equals(title)
                     && item.year.equals(year) && (item.available != checkin)) {
                 item.available = checkin;
                 item.borrower_id = checkin ? null : currentUser.id_number;
-                return true;
+                success = true;
             }
         }
-        return false;
+
+        System.out.println(GetTransactionString(success, checkin, matcher.group(2)));
     }
 
     private static String GetTransactionString(Boolean success, Boolean checkin, String itemType) {
@@ -122,18 +126,20 @@ public class BibliotecaApp {
         return checkin ? "That is not a valid " + itemType + " to return." :  "That " + itemType + " is not available.";
     }
 
-    private static Boolean LogIn() {
+    private static void LogIn() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter id number:");
         String id_number = scanner.nextLine();
         System.out.println("Enter password:");
         String passwd = scanner.nextLine();
 
-        return LogInWithCredentials(id_number, passwd);
+        Boolean success = LogInWithCredentials(id_number, passwd);
+
+        String msg = success ? "Login successful" : "Login failed, please try again.";
+        System.out.println(msg);
     }
 
     static Boolean LogInWithCredentials(String id_number, String passwd) {
-        //is this the best way to search?
         Boolean success = false;
         for (User user : users) {
             if (user.id_number.equals(id_number) && user.passwd.equals(passwd)) {
@@ -145,10 +151,12 @@ public class BibliotecaApp {
         return success;
     }
 
-    static Boolean LogOut() {
+    static void LogOut() {
         Boolean success = currentUser != null;
         currentUser = null;
-        return success;
+
+        String msg = success ? "Logout successful" : "No user had logged in";
+        System.out.println(msg);
     }
 
 }
