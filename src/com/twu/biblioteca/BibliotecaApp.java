@@ -1,6 +1,5 @@
 package com.twu.biblioteca;
 
-import javax.swing.text.StyledEditorKit;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +19,10 @@ public class BibliotecaApp {
     private static User basha = new User ("987-6543", "password2", "Basha", "basha@yahoo.com", "508-555-0995");
     static User[] users = new User[]{seth, basha};
 
+    //static LibraryItem[] items = new LibraryItem[]{hp, lotr, oz, incredibles};
     static User currentUser;
+
+    private static Pattern pattern = Pattern.compile("check (in|out) (book|movie) ((?:\\w|\\s)*) [(]((?:\\d)*)[)]");
 
     public static void main(String[] args) {
         PrintIntro();
@@ -42,67 +44,22 @@ public class BibliotecaApp {
 
     static Boolean HandleInput(String command) {
         command = command.toLowerCase();
+        Matcher matcher = pattern.matcher(command);
         //eventually use objects for menu items that have callbacks stored in them?
         if (command.equals("quit")) {
             return false;
         } else if (command.equals("list books")) {
             ListBooks();
-        } else if (command.contains("check out")) {
+        } else if (matcher.find()) {
             if (currentUser == null) {
-                System.out.println("You must log in to check out an item");
+                System.out.println("You must log in to check " + matcher.group(1) + " an item");
             } else {
-                Pattern bookPattern = Pattern.compile("check out ((?:\\w|\\s)*) by ((?:\\w|\\s)*) in (\\d*)");
-                Matcher bookMatcher = bookPattern.matcher(command);
-                Pattern moviePattern = Pattern.compile("check out ((?:\\w|\\s)*) [(]((?:\\d)*)[)]");
-                Matcher movieMatcher = moviePattern.matcher(command);
-                if (bookMatcher.find()) {
-                    Boolean success = BookTransaction(bookMatcher.group(1), bookMatcher.group(2), Integer.parseInt(bookMatcher.group(3)), false);
-                    if (success) {
-                        System.out.println("Thank you! Enjoy the book");
-                    } else {
-                        System.out.println("That book is not available.");
-                    }
-                } else if (movieMatcher.find()) {
-                    Boolean success = MovieTransaction(movieMatcher.group(1), Integer.parseInt(movieMatcher.group(2)), false);
-                    if (success) {
-                        System.out.println("Thank you! Enjoy the movie");
-                    } else {
-                        System.out.println("That movie is not available.");
-                    }
-                }
-            }
-        } else if (command.contains("check in")) {
-            if (currentUser == null) {
-                System.out.println("You must log in to check in an item");
-            } else {
-                Pattern bookPattern = Pattern.compile("check in ((?:\\w|\\s)*) by ((?:\\w|\\s)*) in (\\d*)");
-                Matcher bookMatcher = bookPattern.matcher(command);
-                Pattern moviePattern = Pattern.compile("check in ((?:\\w|\\s)*) [(]((?:\\d)*)[)]");
-                Matcher movieMatcher = moviePattern.matcher(command);
-                if (bookMatcher.find()) {
-                    Boolean success = BookTransaction(bookMatcher.group(1), bookMatcher.group(2), Integer.parseInt(bookMatcher.group(3)), true);
-                    if (success) {
-                        System.out.println("Thank you for returning the book.");
-                    } else {
-                        System.out.println("That is not a valid book to return.");
-                    }
-                } else if (movieMatcher.find()) {
-                    //Boolean success = false; //temp
-                    Boolean success = MovieTransaction(movieMatcher.group(1), Integer.parseInt(movieMatcher.group(2)), true);
-                    if (success) {
-                        System.out.println("Thank you for returning the movie.");
-                    } else {
-                        System.out.println("That is not a valid movie to return.");
-                    }
-                }
+                Boolean checkin = matcher.group(1).equals("in");
+                Boolean success = LibraryTransaction(checkin, matcher.group(2).equals("book"), matcher.group(3), Integer.parseInt(matcher.group(4)));
+                System.out.println(GetTransactionString(success, checkin, matcher.group(2)));
             }
         } else if (command.equals("log in")) {
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("Enter id number:");
-            String id_num = scanner.nextLine();
-            System.out.println("Enter password:");
-            String pw = scanner.nextLine();
-            Boolean success = LogIn(id_num, pw);
+            Boolean success = LogIn();
             String msg = success ? "Login successful" : "Login failed, please try again.";
             System.out.println(msg);
         } else if (command.equals("log out")){
@@ -143,33 +100,36 @@ public class BibliotecaApp {
         System.out.print(menuStr);
     }
 
-    //refactor:
-    static Boolean BookTransaction(String title, String author, Integer year, Boolean checkin) {
-        for(Book book : books) {
-            if (book.title.toLowerCase().equals(title)
-                    && book.author.toLowerCase().equals(author)
-                    && book.year.equals(year) && (book.available != checkin)) {
-                book.available = checkin;
-                book.borrower_id = checkin ? null : currentUser.id_number;
+    static Boolean LibraryTransaction(Boolean checkin, Boolean isBook, String title, Integer year) {
+        LibraryItem[] items = isBook ? books : movies;
+        for (LibraryItem item : items) {
+            if (item.title.toLowerCase().equals(title)
+                    && item.year.equals(year) && (item.available != checkin)) {
+                item.available = checkin;
+                item.borrower_id = checkin ? null : currentUser.id_number;
                 return true;
             }
         }
         return false;
     }
 
-    static Boolean MovieTransaction(String title, Integer year, Boolean checkin) {
-        for(Movie movie : movies) {
-            if (movie.title.toLowerCase().equals(title)
-                    && movie.year.equals(year) && (movie.available != checkin)) {
-                movie.available = checkin;
-                movie.borrower_id = checkin ? null : currentUser.id_number;
-                return true;
-            }
+    private static String GetTransactionString(Boolean success, Boolean checkin, String itemType) {
+        if (success) {
+            return checkin ? "Thank you for returning the " + itemType + "." : "Thank you! Enjoy the " + itemType;
         }
-        return false;
+        return checkin ? "That is not a valid " + itemType + " to return." :  "That " + itemType + " is not available.";
     }
 
-    static Boolean LogIn(String id_number, String passwd) {
+    private static Boolean LogIn() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter id number:");
+        String id_number = scanner.nextLine();
+        System.out.println("Enter password:");
+        String passwd = scanner.nextLine();
+        return LogInWithCredentials(id_number, passwd);
+    }
+
+    static Boolean LogInWithCredentials(String id_number, String passwd) {
         //is this the best way to search?
         Boolean success = false;
         for (User user : users) {

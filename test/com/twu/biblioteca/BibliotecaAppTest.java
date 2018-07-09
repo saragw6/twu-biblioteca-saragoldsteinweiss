@@ -67,10 +67,9 @@ public class BibliotecaAppTest {
 
     @Test
     public void CheckOutMarksBookUnavailable() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
-        //BibliotecaApp.CheckOutBook("harry potter", "jkr", 1997);
-        BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, false);
+        BibliotecaApp.LibraryTransaction(false, true,"harry potter", 1997);
         assert(!BibliotecaApp.books[0].isAvailable());
 
         BibliotecaApp.books[0].setAvailable(true); //reset
@@ -79,10 +78,9 @@ public class BibliotecaAppTest {
 
     @Test
     public void CheckOutMarksMovieUnavailable() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
-        //BibliotecaApp.CheckOutBook("harry potter", "jkr", 1997);
-        BibliotecaApp.MovieTransaction("the wizard of oz", 1939, false);
+        BibliotecaApp.LibraryTransaction(false, false, "the wizard of oz", 1939);
         assert(!BibliotecaApp.movies[0].isAvailable());
 
         BibliotecaApp.movies[0].setAvailable(true); //reset
@@ -91,8 +89,7 @@ public class BibliotecaAppTest {
 
     @Test
     public void OnlyPrintAvailableBooks() {
-        //BibliotecaApp.CheckOutBook("harry potter", "jkr", 1997);
-        BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, false);
+        BibliotecaApp.LibraryTransaction(false, true,"harry potter", 1997);
         BibliotecaApp.ListBooks();
 
         String bookStr = "Lord of the Rings | JRT | 1954\n";
@@ -102,8 +99,7 @@ public class BibliotecaAppTest {
 
     @Test
     public void OnlyPrintAvailableMovies() {
-        //BibliotecaApp.CheckOutBook("harry potter", "jkr", 1997);
-        BibliotecaApp.MovieTransaction("the wizard of oz", 1939, false);
+        BibliotecaApp.LibraryTransaction(false, false, "the wizard of oz", 1939);
         BibliotecaApp.ListMovies();
 
         String movieStr = "Incredibles 2 | 2018 | Brad Bird | 8\n";
@@ -113,9 +109,9 @@ public class BibliotecaAppTest {
 
     @Test
     public void HandleCheckOutBookCommand() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
-        BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1997\n");
+        BibliotecaApp.HandleInput("Check out book Harry Potter (1997)\n");
         assert(!BibliotecaApp.books[0].isAvailable());
 
         BibliotecaApp.books[0].setAvailable(true); //reset
@@ -124,9 +120,9 @@ public class BibliotecaAppTest {
 
     @Test
     public void HandleCheckOutMovieCommand() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
-        BibliotecaApp.HandleInput("Check out The Wizard of Oz (1939)\n");
+        BibliotecaApp.HandleInput("Check out movie The Wizard of Oz (1939)\n");
         assert(!BibliotecaApp.movies[0].isAvailable());
 
         BibliotecaApp.movies[0].setAvailable(true); //reset
@@ -135,10 +131,10 @@ public class BibliotecaAppTest {
 
     @Test
     public void SuccessfulCheckoutBookMessage() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
         BibliotecaApp.books[0].setAvailable(true); //ensure checked in
-        BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1997\n");
+        BibliotecaApp.HandleInput("Check out book Harry Potter (1997)\n");
 
         String successStr = "Thank you! Enjoy the book\n";
 
@@ -148,10 +144,10 @@ public class BibliotecaAppTest {
 
     @Test
     public void SuccessfulCheckoutMovieMessage() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
         BibliotecaApp.movies[0].setAvailable(true); //ensure checked in
-        BibliotecaApp.HandleInput("Check out The Wizard of Oz (1939)\n");
+        BibliotecaApp.HandleInput("Check out movie The Wizard of Oz (1939)\n");
 
         String successStr = "Thank you! Enjoy the movie\n";
 
@@ -161,9 +157,9 @@ public class BibliotecaAppTest {
 
     @Test
     public void UnsuccessfulCheckoutBookMessage() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
-        BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1996\n");
+        BibliotecaApp.HandleInput("Check out book Harry Potter (1996)\n");
 
         String successStr = "That book is not available.\n";
 
@@ -173,9 +169,9 @@ public class BibliotecaAppTest {
 
     @Test
     public void UnsuccessfulCheckoutMovieMessage() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
-        BibliotecaApp.HandleInput("Check out The Wizard of Oz (1939)\n");
+        BibliotecaApp.HandleInput("Check out movie The Wizard of Oz (1939)\n");
 
         String successStr = "That movie is not available.\n";
 
@@ -185,10 +181,10 @@ public class BibliotecaAppTest {
 
     @Test
     public void CheckoutUnavailableBookFails() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
         BibliotecaApp.books[0].setAvailable(false); //simulate checkout
-        BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1997\n");
+        BibliotecaApp.HandleInput("Check out book Harry Potter (1997)\n");
 
         String failStr = "That book is not available.\n";
 
@@ -198,10 +194,10 @@ public class BibliotecaAppTest {
 
     @Test
     public void CheckoutUnavailableMovieFails() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
         BibliotecaApp.movies[0].setAvailable(false); //simulate checkout
-        BibliotecaApp.HandleInput("Check out The Wizard of Oz (1939)\n");
+        BibliotecaApp.HandleInput("Check out movie The Wizard of Oz (1939)\n");
 
         String failStr = "That movie is not available.\n";
 
@@ -211,12 +207,11 @@ public class BibliotecaAppTest {
 
     @Test
     public void CheckInMarksBookAvailable() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
         BibliotecaApp.books[0].setAvailable(false); //simulate checkout
 
-        //BibliotecaApp.CheckInBook("harry potter", "jkr", 1997);
-        BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, true);
+        BibliotecaApp.LibraryTransaction(true, true,"harry potter", 1997);
 
         assert(BibliotecaApp.books[0].isAvailable());
         BibliotecaApp.LogOut();
@@ -224,11 +219,11 @@ public class BibliotecaAppTest {
 
     @Test
     public void CheckInMarksMovieAvailable() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
         BibliotecaApp.movies[0].setAvailable(false); //simulate checkout
 
-        BibliotecaApp.MovieTransaction("the wizard of oz", 1939, true);
+        BibliotecaApp.LibraryTransaction(true, false, "the wizard of oz", 1939);
 
         assert(BibliotecaApp.movies[0].isAvailable());
         BibliotecaApp.LogOut();
@@ -236,22 +231,22 @@ public class BibliotecaAppTest {
 
     @Test
     public void HandleCheckInBookCommand() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
         BibliotecaApp.books[0].setAvailable(false); //simulate checkout
 
-        BibliotecaApp.HandleInput("Check in Harry Potter by JKR in 1997\n");
+        BibliotecaApp.HandleInput("Check in book Harry Potter (1997)\n");
         assert(BibliotecaApp.books[0].isAvailable());
         BibliotecaApp.LogOut();
     }
 
     @Test
     public void HandleCheckInMovieCommand() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
         BibliotecaApp.movies[0].setAvailable(false); //simulate checkout
 
-        BibliotecaApp.HandleInput("Check in The Wizard of Oz (1939)\n");
+        BibliotecaApp.HandleInput("Check in movie The Wizard of Oz (1939)\n");
         assert(BibliotecaApp.movies[0].isAvailable());
         BibliotecaApp.LogOut();
     }
@@ -259,7 +254,7 @@ public class BibliotecaAppTest {
     @Test
     public void PrintReturnedBooks() {
         BibliotecaApp.books[0].setAvailable(false); //simulate checkout
-        BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, true);
+        BibliotecaApp.LibraryTransaction(true, true,"harry potter", 1997);
 
         BibliotecaApp.ListBooks();
 
@@ -271,7 +266,7 @@ public class BibliotecaAppTest {
     @Test
     public void PrintReturnedMovies() {
         BibliotecaApp.movies[0].setAvailable(false); //simulate checkout
-        BibliotecaApp.MovieTransaction("the wizard of oz", 1939, true);
+        BibliotecaApp.LibraryTransaction(true, false, "the wizard of oz", 1939);
 
         BibliotecaApp.ListMovies();
 
@@ -282,10 +277,10 @@ public class BibliotecaAppTest {
 
     @Test
     public void SuccessfulCheckinBookMessage() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
         BibliotecaApp.books[0].setAvailable(false); //simulate checkout
-        BibliotecaApp.HandleInput("Check in Harry Potter by JKR in 1997\n");
+        BibliotecaApp.HandleInput("Check in book Harry Potter (1997)\n");
 
         String successStr = "Thank you for returning the book.\n";
 
@@ -295,10 +290,10 @@ public class BibliotecaAppTest {
 
     @Test
     public void SuccessfulCheckinMovieMessage() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
         BibliotecaApp.movies[0].setAvailable(false); //simulate checkout
-        BibliotecaApp.HandleInput("Check in The Wizard of Oz (1939)\n");
+        BibliotecaApp.HandleInput("Check in movie The Wizard of Oz (1939)\n");
 
         String successStr = "Thank you for returning the movie.\n";
 
@@ -308,9 +303,9 @@ public class BibliotecaAppTest {
 
     @Test
     public void UnsuccessfulCheckinBookMessage() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
-        BibliotecaApp.HandleInput("Check in Harry Potter by JKR in 1996\n");
+        BibliotecaApp.HandleInput("Check in book Harry Potter (1996)\n");
 
         String successStr = "That is not a valid book to return.\n";
 
@@ -320,9 +315,9 @@ public class BibliotecaAppTest {
 
     @Test
     public void UnsuccessfulCheckinMovieMessage() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
-        BibliotecaApp.HandleInput("Check in The Wizard of Oz (1939)\n");
+        BibliotecaApp.HandleInput("Check in movie The Wizard of Oz (1939)\n");
 
         String successStr = "That is not a valid movie to return.\n";
 
@@ -332,7 +327,7 @@ public class BibliotecaAppTest {
 
     @Test
     public void LogInSetsCurrentUser() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
         assert(BibliotecaApp.currentUser.id_number.equals("123-4567"));
     }
@@ -370,7 +365,7 @@ public class BibliotecaAppTest {
 
     @Test
     public void HandleLogOutCommandWithSuccessMsg() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
 
         BibliotecaApp.HandleInput("Log out");
 
@@ -393,18 +388,18 @@ public class BibliotecaAppTest {
     }
 
     @Test
-    public void CheckInRequireLogin() {
+    public void CheckInRequireLoginWithCredentials() {
         BibliotecaApp.currentUser = null;
-        BibliotecaApp.HandleInput("Check in Harry Potter by JKR in 1996\n");
+        BibliotecaApp.HandleInput("Check in book Harry Potter (1996)\n");
         String output = "You must log in to check in an item\n";
 
         assertEquals(output, sysOut.asString());
     }
 
     @Test
-    public void CheckOutRequireLogin() {
+    public void CheckOutRequireLoginWithCredentials() {
         BibliotecaApp.currentUser = null;
-        BibliotecaApp.HandleInput("Check out Harry Potter by JKR in 1996\n");
+        BibliotecaApp.HandleInput("Check out book Harry Potter (1996)\n");
         String output = "You must log in to check out an item\n";
 
         assertEquals(output, sysOut.asString());
@@ -412,17 +407,17 @@ public class BibliotecaAppTest {
 
     @Test
     public void CheckOutNotesBorrower() {
-        BibliotecaApp.LogIn("123-4567", "password1");
-        BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, false);
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
+        BibliotecaApp.LibraryTransaction(false, true,"harry potter", 1997);
         assertEquals("123-4567", BibliotecaApp.books[0].borrower_id);
         BibliotecaApp.LogOut();
     }
 
     @Test
     public void CheckInRemovesBorrower() {
-        BibliotecaApp.LogIn("123-4567", "password1");
-        BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, false);
-        BibliotecaApp.BookTransaction("harry potter", "jkr", 1997, true);
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
+        BibliotecaApp.LibraryTransaction(false, true,"harry potter", 1997);
+        BibliotecaApp.LibraryTransaction(true, true,"harry potter", 1997);
         assertNull(BibliotecaApp.books[0].borrower_id);
         BibliotecaApp.LogOut();
     }
@@ -436,7 +431,7 @@ public class BibliotecaAppTest {
 
     @Test
     public void HandleInputUserInfo() {
-        BibliotecaApp.LogIn("123-4567", "password1");
+        BibliotecaApp.LogInWithCredentials("123-4567", "password1");
         BibliotecaApp.HandleInput("Show user info");
 
         String output = "Name: Seth\nEmail: seth@gmail.com\nPhone:855-555-0956\n";
