@@ -21,7 +21,7 @@ public class BibliotecaApp {
 
     static User currentUser;
 
-    private static Pattern pattern = Pattern.compile("check (in|out) (book|movie) ((?:\\w|\\s)*) [(]((?:\\d)*)[)]");
+    private static Pattern pattern = Pattern.compile("check (in|out) (book|movie) ((?:.)*) [(]((?:\\d){4})[)]");
 
     public static void main(String[] args) {
         PrintIntro();
